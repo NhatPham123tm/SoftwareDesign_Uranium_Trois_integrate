@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=django
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+      
+  backend:
+    build: ./backend
+    volumes:
+      - .backend:/usr/src/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    volumes:
+      - .frontend:/usr/src/app
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+      
