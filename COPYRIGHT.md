@@ -1,4 +1,8 @@
+COPYRIGHT
+============================
+
 MIT License
+-----------
 
 Copyright (c) 2025 Software Design Trois-Rivières Team
 

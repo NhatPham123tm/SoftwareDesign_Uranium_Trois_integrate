@@ -1,0 +1,539 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    
+</head>
+<body>
+    
+    <!-- Sidepanel -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Admin Panel</h3>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#dashboard" class="active">Summary</a></li>
+            <li><a href="#users" onclick="userLoad(); return false;">Users</a></li>
+            <li><a href="#forms" onclick="stuff(); return false;">Forms</a></li>
+            <li><a href="#" onclick=logoutUser() id="logoutBtn">Logout</a></li>
+        </ul>
+        <a href="" id="userLink">← Back to Dashboard</a>
+    </div>
+    <!-- Holds content for all sidepanel selections -->
+    <div class="main">
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="part active">
+            <div>
+                <h1>Summary Report</h1>
+                <div class="dashboard-stats">
+                    <div class="stat-box">Total Users: <span id="totalUsers">0</span></div>
+                    <div class="stat-box">Total Admins: <span id="totalAdmins">0</span></div>
+                    <div class="stat-box">Total Basic Users: <span id="totalBasicUsers">0</span></div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="userStatsChart"></canvas>
+                </div>
+
+                <div class="dashboard-stats">
+                    <div class="stat-box">Total Users: <span id="totalUsers">0</span></div>
+                    <div class="stat-box">Active Users: <span id="totalActiveUsers">0</span></div>
+                    <div class="stat-box">Inactive Users: <span id="totalInactiveUsers">0</span></div>
+                    <div class="stat-box">Banned Users: <span id="totalBannedUsers">0</span></div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="userStatsChart_AIB"></canvas>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Users list box -->
+        <div class="part" id="users">
+            <div class="container">
+                <div class="tabldgn">
+                    <div class="filters">
+                        <!-- Create User section
+                        <select id="roleFilter">
+                            <option value="all">All Roles</option>
+                            <option value="admin">Admin</option>
+                            <option value="basicuser">basicuser</option>
+                        </select>-->
+                    </div>
+
+                    <!-- Create User section -->
+                    <button class="btsg" id="createbt">
+                        Create User
+                    </button>
+
+                    <div class="back-panel" id="back-panel">
+                        <div class="pnl">
+                            <div class="panel-top"> 
+                                <h1>Create User</h1>
+                                <button class="xBt" id="closePanel">x</button>
+                            </div>
+                            <form id="registerForm">
+                                <div class="form-group">
+                                    <label for="id">UH ID:</label>
+                                    <input type="text" id="id" placeholder="7 digits" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Password:</label>
+                                    <input type="password" id="password" placeholder="Min 7 characters" required minlength="7">
+                                </div>
+                                <div class="form-group">
+                                    <label for="retypePassword">Confirm Password:</label>
+                                    <input type="password" id="retypePassword" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="name">Name:</label>
+                                    <input type="text" id="name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="user_email">Email:</label>
+                                    <input type="email" id="user_email" required>
+                                </div>
+                                <button type="button" id="submitButton" class="bts">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- End of Create User section -->
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Role</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <!-- Insert Users -->
+                            
+                        </tbody>
+                    </table>
+                    <!-- Edit users -->
+                    <div id="editPanel" class="edit-panel">
+                        <div class="panel-content">
+                            <span class="close-btn" onclick="closeEditPanel()">&times;</span>
+                            
+                            <!-- Current User Info Section -->
+                            <div class="current-info">
+                                <h3>Current User Information</h3>
+                                <p>User ID: <span id="currentID"></span></p>
+                                <p>Name: <span id="currentName"></span></p>
+                                <p>Email: <span id="currentEmail"></span></p>
+                                <p>Status: <span id="currentStatus"></span></p>
+                                <p>Role: <span id="currentRole"></span></p>
+                            </div>
+                    
+                            <!-- Edit Form Section -->
+                            <div class="edit-section">
+                                <h3>Update Information</h3>
+                                <form id="editForm" onsubmit="handleEdit(event)">
+                                    
+                                    <input type="hidden" id="userId">
+                                    <div class="form-group">
+                                        <label for="newName">New Name:</label>
+                                        <input type="text" id="newName">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="newEmail">New Email:</label>
+                                        <input type="email" id="newEmail">
+                                    </div>
+                                    <div class="form-group">
+                                        <select id="newStatus">
+                                            <!-- User status -->
+                                        </select>
+                                        
+                                    </div>
+                                    <div class="form-group">
+                                        <select id="newRole">
+                                            
+                                        </select>
+                                    </div>
+                                    <button type="submit">Update User</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Edit end -->
+                </div>
+            </div>
+        </div>
+
+        <div class="part" id="forms">
+            <div class="container">
+                <div class="tabldgn">
+                    <h3>Pending Forms</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Date</th>
+                                <th>User ID</th>
+                                <th>PDF</th>
+                                <th>PDFType</th>
+                                <th>Status Change</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingTableBody"></tbody>
+                    </table>
+                    
+                    <h3>Approved / Rejected / Cancelled Forms</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Date</th>
+                                <th>User ID</th>
+                                <th>PDF</th>
+                                <th>PDFType</th>
+                                <th>Status Change</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="processedTableBody"></tbody>
+                    </table>
+
+                    <!-- Signature Modal -->
+                    <div id="signatureModal" style="display:none; position:fixed; top:20%; left:50%; transform:translate(-50%, 0); background:#fff; border:1px solid #ccc; padding:20px; z-index:1000;">
+                        <h3>Supervisor Signature</h3>
+                        <canvas id="signatureCanvas" width="400" height="150" style="border:1px solid #000;"></canvas><br>
+                        <button onclick="saveSignature()">Save</button>
+                        <button onclick="clearSignature()">Clear</button>
+                        <button onclick="closeSignatureModal()">Cancel</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'js/admin.js' %}" defer></script>
+    <script>
+        function stuff() {
+    fetch("/api/payroll/")
+        .then(response => response.json())
+        .then(payrollData => {
+            return fetch("/api/reimburse/")
+                .then(response => response.json())
+                .then(reimburseData => ({ payrollData, reimburseData }));
+        })
+        .then(({ payrollData, reimburseData }) => {
+            const pendingTbody = document.getElementById('pendingTableBody');
+            const processedTbody = document.getElementById('processedTableBody');
+            pendingTbody.innerHTML = '';
+            processedTbody.innerHTML = '';
+
+            const allPayroll = payrollData.filter(p => p.status !== "Draft");
+            const allReimburse = reimburseData.filter(r => r.status !== "Draft");
+
+            const pendingForms = [
+                ...allPayroll.filter(p => p.status === "Pending"),
+                ...allReimburse.filter(r => r.status === "Pending")
+            ].sort((a, b) => new Date(b.todays_date || b.today_date) - new Date(a.todays_date || a.today_date));
+
+            const processedForms = [
+                ...allPayroll.filter(p => p.status !== "Pending"),
+                ...allReimburse.filter(r => r.status !== "Pending")
+            ].sort((a, b) => new Date(b.todays_date || b.today_date) - new Date(a.todays_date || a.today_date));
+
+            renderForms(pendingForms, pendingTbody);
+            renderForms(processedForms, processedTbody);
+        })
+        .catch(error => {
+            console.error('Error loading users:', error);
+        });
+}
+
+        function renderForms(dataArray, tbody) {
+            dataArray.forEach(user => {
+                const date = user.todays_date || user.today_date || "—";
+                const isPayroll = 'todays_date' in user;
+
+                const viewUrl = isPayroll
+                    ? `/view_payroll_pdf2/${user.id}/`
+                    : `/view_pdf2/${user.id}/`;
+
+                const deleteHandler = `deleteForm(${user.id}, '${isPayroll ? "payroll" : "reimburse"}')`;
+
+                const selectId = `statusSelect_${isPayroll ? "payroll" : "reimburse"}_${user.id}`;
+                const options = `
+                    <option value="Pending" ${user.status === "Pending" ? "selected" : ""}></option>
+                    <option value="Approved">Approve</option>
+                    <option value="Rejected">Reject</option>
+                    <option value="Cancelled">Cancell</option>
+                `;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${user.employee_name}</td>
+                        <td>${date}</td>
+                        <td>${user.employee_id}</td>
+                        <td><a href="${viewUrl}" target="_blank">Open PDF</a></td>
+                        <td>${isPayroll ? "Payroll Form" : "Reimburse Form"}</td>
+                        <td>
+                            <p>${user.status}</p>
+                            <select id="${selectId}">${options}</select>
+                        </td>
+                        <td>
+                            <button class="del-button" onclick="${deleteHandler}">Delete</button>
+                        </td>
+                    </tr>`;
+
+                // 🔧 Attach the event listener
+                setTimeout(() => {
+                    const selectElement = document.getElementById(selectId);
+                    if (selectElement) {
+                        selectElement.addEventListener('change', function () {
+                            if (isPayroll) {
+                                handlePayrollStatus(user.id, this.value);
+                            } else {
+                                changeStatus(user.id, this.value);
+                            }
+                        });
+                    }
+                }, 0);
+            });
+        }
+
+
+        
+        function changeStatus(id, newStatus) {
+            if (newStatus === "Approved") {
+                selectedReimburseId = id;              
+                signingType = "reimburse";
+                openSignatureModal();
+                return;
+            }
+
+
+        // Fallback: status change without signature
+            fetch(`/api/reimburse/${id}/`, {
+                method: "PATCH",
+                credentials: "same-origin",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ status: newStatus })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(`Updated status for ID ${id}:`, data);
+                stuff();
+            })
+            .catch(error => {
+                console.error("Error updating status:", error);
+            });
+        }
+        
+        function updateStatus(id, newStatus) {
+            const newData = {
+                status: document.getElementById('newRole3').value
+            };
+            console.log(document.getElementById('newRole3').value)
+            fetch(`/api/payroll/${id}/`, {
+                method: "PATCH",  // Use PATCH to update only the status
+                credentials: "same-origin",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"               
+                },
+                body: JSON.stringify({ status: newStatus })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(`Updated status for ID ${id}:`, data);
+                stuff();
+            })
+            .catch(error => {
+                console.error("Error updating status:", error);
+            });
+        }
+
+        function openEditPanel2(userId) {
+            document.getElementById('userId').value = userId;
+                    
+        
+            // Show the panel
+            document.getElementById('editPanel2').style.display = 'block';
+            fetch(`/api/reimburse/${userId}/`)
+                .then(response => response.json())
+                .then(user => {
+                    console.log(user)
+                    // Set current info
+                    document.getElementById('currenID').textContent = user.employee_id;
+                    document.getElementById('currenName').textContent = user.name;
+                    document.getElementById('currenEmail').textContent = user.email;
+                    
+                    
+                    
+        
+                    // Set hidden user ID
+                    document.getElementById('userId').value = userId;
+                    
+        
+                    // Show the panel
+                    document.getElementById('editPanel2').style.display = 'block';
+        
+                });
+        }
+
+        function closeEditPanel2() {
+            document.getElementById('editPanel2').style.display = 'none';
+            
+        }
+    
+    </script>
+
+    <!-- For live signing-->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script>
+        let selectedReimburseId = null;
+        let selectedPayrollId = null;
+        let signaturePad;
+        let signingType = null; // "payroll" or "reimburse"
+
+    
+        document.addEventListener("DOMContentLoaded", function () {
+            const canvas = document.getElementById("signatureCanvas");
+            signaturePad = new SignaturePad(canvas);
+        });
+        
+        function openPayrollSignatureModal(payrollId) {
+            selectedPayrollId = payrollId;
+            signingType = "payroll";
+            document.getElementById("signatureModal").style.display = "block";
+        }
+
+        function openSignatureModal() {
+            document.getElementById("signatureModal").style.display = "block";
+        }
+
+    
+        function closeSignatureModal() {
+            document.getElementById("signatureModal").style.display = "none";
+            signaturePad.clear();
+            selectedReimburseId = null;
+            selectedPayrollId = null;
+            signingType = null;
+        }
+
+    
+        function clearSignature() {
+            signaturePad.clear();
+        }
+    
+        function saveSignature() {
+            if (signaturePad.isEmpty()) {
+                alert("Please provide a signature before saving.");
+                return;
+            }
+
+            const signatureBase64 = signaturePad.toDataURL();
+            const today = new Date().toISOString().split('T')[0];
+
+            let url = "";
+            let payload = {
+                status: "Approved",
+                signatureAdmin_base64: signatureBase64,
+                approve_date: today
+            };
+
+            if (signingType === "reimburse") {
+                url = `/api/reimburse/${selectedReimburseId}/`;
+            } else if (signingType === "payroll") {
+                url = `/api/payroll/${selectedPayrollId}/`;
+            } else {
+                alert("Unknown signing type.");
+                return;
+            }
+
+            fetch(url, {
+                method: "PATCH",
+                credentials: "same-origin",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Signature saved and status updated:", data);
+                closeSignatureModal();
+                stuff();
+            })
+            .catch(error => {
+                console.error("Error submitting signature:", error);
+            });
+        }
+        
+        function handlePayrollStatus(id, newStatus) {
+            if (newStatus === "Approved") {
+                selectedPayrollId = id;
+                signingType = "payroll";
+                openSignatureModal();
+                return;
+            }
+
+            fetch(`/api/payroll/${id}/`, {
+                method: "PATCH",
+                credentials: "same-origin",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ status: newStatus })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(`Updated payroll status for ID ${id}:`, data);
+                stuff();
+            })
+            .catch(error => {
+                console.error("Error updating payroll status:", error);
+            });
+        }
+
+
+        function deleteForm(id, type) {
+            const url = type === 'payroll' ? `/api/payroll/${id}/` : `/api/reimburse/${id}/`;
+
+            if (confirm("Are you sure you want to delete this form?")) {
+                fetch(url, {
+                    method: "DELETE",
+                    credentials: "same-origin",
+                    headers: {
+                        "X-CSRFToken": getCookie("csrftoken")
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log(`Form with ID ${id} deleted successfully.`);
+                        stuff(); // Refresh the table
+                    } else {
+                        console.error(`Failed to delete form with ID ${id}.`);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error deleting form:", error);
+                });
+            }
+        }
+    </script>
+    
+</body>
+</html>
