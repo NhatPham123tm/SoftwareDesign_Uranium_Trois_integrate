@@ -85,11 +85,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
 ]
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8000",  
-    "http://127.0.0.1:8000", 
-]
+
 CORS_ALLOW_CREDENTIALS = True
+SITE_ID = 2
+
+CORS_ALLOW_ALL_ORIGINS = True
+CSRF_TRUSTED_ORIGINS = ['http://localhost:5173']
+
 ROOT_URLCONF = 'UserManagement.urls'
 AUTH_USER_MODEL = 'api.user_accs'
 
