@@ -84,7 +84,9 @@ webencodings==0.5.1
 whitenoise==6.0.0
 drf-nested-routers>=0.92.1
 Pillow
-
+python-social-auth==0.3.6
+django-tex==1.1.10
+dj-rest-auth==7.0.1
 # Install Python first
 # requirements.txt stores all the necessary packages
 # Run "pip install -r requirements.txt"
