@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import user_accs, roles, permission, PayrollAssignment, ReimbursementRequest
+from .models import user_accs, roles, permission, PayrollAssignment, ReimbursementRequest, Request
 
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -40,3 +40,12 @@ class ReimbursementRequestSerializer(serializers.ModelSerializer):
         model = ReimbursementRequest
         fields = '__all__'
 
+class RequestSerializer(serializers.ModelSerializer):
+    signature = serializers.ImageField(required=False, allow_null = True)
+    admin_signature = serializers.ImageField(required=False, allow_null = True)
+
+    class Meta:
+        model = Request
+        # Missing 'data' for now
+        fields = ['id', 'status', 'reason_for_return', 'form_type', 'pdf', 'signature', 'admin_signature']
+        read_only_fields = ['id'] 
