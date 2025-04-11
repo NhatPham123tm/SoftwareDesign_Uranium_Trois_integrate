@@ -259,3 +259,40 @@ class ReimbursementRequest(models.Model):
     def save(self, *args, **kwargs):
         self.clean()  # Enforce constraint before saving
         super().save(*args, **kwargs)
+
+class Request(models.Model):
+    STATUS_CHOICES = [
+        ('Draft', 'Draft'),
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+        ('Cancelled', 'Cancelled'),
+    ]
+
+    user = models.ForeignKey(user_accs, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(default=timezone.now)
+    employee_name = models.CharField(max_length=100, blank=True, null=True)
+    employee_id = models.CharField(max_length=50, blank=True, null=True) 
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Draft')
+    #user = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
+    reason_for_return = models.TextField(blank=True, null=True)
+    #data = JSONField(blank=True, null=True)
+    form_type = models.CharField(max_length=100) 
+    pdf = models.FileField(upload_to='diploma_pdfs/', null=True, blank=True)
+    signature = models.ImageField(upload_to='signatures/', null=True, blank=True)
+    admin_signature = models.ImageField(upload_to='signatures/', null=True, blank=True)
+
+    def get_status_display(self):
+        return dict(self.STATUS_CHOICES).get(self.status, self.status)
+    
+    def __str__(self):
+        return f"{self.id} ({self.employee_name})"
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user'],
+                condition=models.Q(status='Pending'),
+                name='unique_pending_form_request_per_user'
+            )
+        ]
