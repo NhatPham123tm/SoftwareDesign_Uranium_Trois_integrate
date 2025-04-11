@@ -21,6 +21,9 @@ from django.contrib.auth.hashers import make_password
 from api.serializers import UserSerializer
 from django.views.decorators.csrf import csrf_exempt
 
+def landing(request):
+    return render(request, 'landing.html')
+
 def home(request):
     return render(request, 'home.html')
 
