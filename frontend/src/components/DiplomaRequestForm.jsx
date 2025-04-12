@@ -3,12 +3,19 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import './Form.css';
 import Signature from './Signature'; 
 
+function getCSRFToken() {
+  const match = document.cookie.match(/csrftoken=([^;]+)/);
+  return match ? match[1] : null;
+}
+
 const DiplomaRequestForm = () => {
   const location = useLocation();
   const [message, setMessage] = useState("");
-  const firstName = localStorage.getItem("firstName") || "";
-  const lastName = localStorage.getItem("lastName") || "";
-  const fullName = [firstName, lastName].filter(Boolean).join(" ");
+  const userDataRaw = localStorage.getItem("userData");
+  const userData = userDataRaw ? JSON.parse(userDataRaw) : {};
+  const fullName = userData.name || "";
+  const studentID = userData.userId || "";
+
 
   const [formData, setFormData] = useState({
     StudentIdNumber: "",
@@ -32,18 +39,17 @@ const DiplomaRequestForm = () => {
   useEffect(() => {
     setFormData(prevData => ({
       ...prevData,
-      name: fullName
+      name: fullName,
+      StudentIdNumber: studentID
     }));
 
-    if (location.state) {
-      if (location.state.formData && location.state.formData.data) {
-        setFormData({
-          ...location.state.formData.data,
-          draftId: location.state.formData.id || null,
-        });
-      }
+    if (location.state?.formData?.data) {
+      setFormData({
+        ...location.state.formData.data,
+        draftId: location.state.formData.id || null,
+      });
     }
-  }, [location.state]);
+  }, [location.state, fullName, studentID]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -85,9 +91,10 @@ const DiplomaRequestForm = () => {
     try {
       const response = await fetch(url, {
         method: draftId ? "PUT" : "POST",
+        credentials: "include",
         headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCSRFToken(),
         },
         body: JSON.stringify(requestData),
       });
@@ -102,7 +109,7 @@ const DiplomaRequestForm = () => {
           setMessage("Form saved as draft.");
         }
 
-        if (status === 'draft' && !draftId && data.request && data.request.id) {
+        if (status === 'Draft' && !draftId && data.request && data.request.id) {
           setFormData((prevState) => ({
             ...prevState,
             draftId: data.request.id,
@@ -258,15 +265,15 @@ const DiplomaRequestForm = () => {
         <label>
           Graduation Year:
           <input
-            type="number"
+            type="text"
             name="GradDateYear"
-            value={formData.GradDateYear || ""}
+            value={formData.GradDateYear}
             onChange={handleChange}
             required
             minLength={4}
             maxLength={4}
-            pattern="[0-9]+" 
-            title="Please enter 4-digit number only"
+            pattern="[0-9]{4}"
+            title="Please enter 4-digit year"
           />
         </label>
 
@@ -303,7 +310,7 @@ const DiplomaRequestForm = () => {
         <div className="form-buttons">
           <button
             type="button"
-            onClick={(e) => handleSubmit(e, 'draft')}
+            onClick={(e) => handleSubmit(e, 'Draft')}
           >
             Save as Draft
           </button>
