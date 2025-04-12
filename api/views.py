@@ -11,7 +11,7 @@ from .models import Request
 from .serializers import RequestSerializer
 from django.shortcuts import get_object_or_404
 from django_tex.shortcuts import render_to_pdf
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.http import FileResponse
 from django.http import HttpResponse
@@ -24,6 +24,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from django.contrib.auth.hashers import check_password
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
 
 class RoleViewSet(viewsets.ModelViewSet):
     queryset = roles.objects.all()
@@ -125,6 +127,10 @@ class ReimbursementRequestViewSet(viewsets.ModelViewSet):
         except ReimbursementRequest.DoesNotExist:
             return Response({'detail': 'User form not found.'}, status=status.HTTP_404_NOT_FOUND)
 
+@ensure_csrf_cookie
+def get_csrf_token(request):
+    return JsonResponse({"detail": "CSRF cookie set"})
+
 class SignupView(APIView):
     permission_classes = [AllowAny]
 
@@ -160,24 +166,21 @@ class LoginView(APIView):
         email = request.data.get("email")
         password = request.data.get("password")
 
-        try:
-            user = user_accs.objects.get(email=email)
-            if check_password(password, user.password_hash):
-                token, _ = Token.objects.get_or_create(user=user)
-                return Response({
-                    "token": token.key,
-                    "isSuperUser": user.is_superuser,
-                    "userId": user.id,
-                    "name": user.name,
-                    "email": user.email,
-                    "role": user.role.role_name,
-                    "status": user.status
-                })
-            else:
-                return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+        user = authenticate(request, username=email, password=password)
 
-        except user_accs.DoesNotExist:
-            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        if user is not None:
+            login(request, user)  # create Django session
+
+            return Response({
+                "isSuperUser": user.is_superuser,
+                "userId": user.id,
+                "name": user.name,
+                "email": user.email,
+                "role": user.role.role_name,
+                "status": user.status
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
         
 class UserFormsView(APIView):

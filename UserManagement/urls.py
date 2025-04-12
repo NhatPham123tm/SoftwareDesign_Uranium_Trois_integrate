@@ -10,6 +10,7 @@ from formProcessor.views import (
     payroll_step5, payroll_step6, payroll_step7, payroll_step8,
     payroll_step9, payroll_step10, payroll_review, delete_payroll, view_payroll_pdf
 )
+from api.views import get_csrf_token
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -61,5 +62,7 @@ urlpatterns = [
     path('view_payroll_pdf3/<int:form_id>/', view_payroll_pdf3, name='view_payroll_pdf3'),
     path('check_id_exists/<int:user_id>/', check_id_exists, name='check_id_exists'),
     path('api/check_email_exists/<str:email>/', check_email_exists, name='check_email_exists'),
+
+    path("api/csrf/", get_csrf_token),
 
 ]
