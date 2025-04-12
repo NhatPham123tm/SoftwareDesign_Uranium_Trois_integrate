@@ -129,13 +129,6 @@ def dashboard(request):
 
 # Initialize MSAL
 def get_msal_app():
-    return msal.ConfidentialClientApplication(
-        settings.MICROSOFT_AUTH_CLIENT_ID,
-        authority=settings.MICROSOFT_AUTHORITY,
-        client_credential=settings.MICROSOFT_AUTH_CLIENT_SECRET,
-    )
-
-def get_msal_app():
     """Returns a configured MSAL ConfidentialClientApplication instance."""
     return msal.ConfidentialClientApplication(
         settings.MICROSOFT_AUTH_CLIENT_ID,
@@ -144,6 +137,17 @@ def get_msal_app():
     )
 
 # Microsoft Login
+def microsoft_login_json(request):
+    team = request.GET.get("team", "trois-rivieres")
+
+    msal_app = get_msal_app()
+    auth_url = msal_app.get_authorization_request_url(
+        scopes=["User.Read"],
+        redirect_uri=settings.MICROSOFT_AUTH_REDIRECT_URI,
+        state=team  
+    )
+    return JsonResponse({"auth_url": auth_url})
+
 def microsoft_login(request):
     """Redirect the user to Microsoft's login page."""
     msal_app = get_msal_app()
@@ -240,13 +244,18 @@ def microsoft_callback(request):
             "status": user.status
         }
     }
-    
-    # Clear cookies after user creation and login
+    team = request.GET.get("state", "trois-rivieres")
+
     if user.status == "active":
-        response = redirect(f"/dashboard/")
+        print(team)
+        if team == "uranium":
+            redirect_url = "http://localhost:5173/home"
+        else:
+            redirect_url = "http://localhost:8000/dashboard"
+        response = redirect(redirect_url)
     else:
         response = redirect("/suspend")
-    
+
     response.delete_cookie('sessionId')
     response.delete_cookie('password')
 

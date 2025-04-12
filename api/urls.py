@@ -11,6 +11,7 @@ router.register(r'permissions', PermissionViewSet)
 router.register(r'payroll', PayrollAssignmentViewSet)
 router.register(r'reimburse', ReimbursementRequestViewSet)
 from .views import RequestSubmitView, SignupView, LoginView, UserFormsView, servePDF, RequestDeleteView, AdminRequestsView, RequestApprovalView
+from authentication import views
 urlpatterns = [
     path('', include(router.urls)),
     # Users can view these
@@ -19,7 +20,9 @@ urlpatterns = [
     path('users/forms/', UserFormsView.as_view(), name='user-forms'),
     path('admin/requests/', AdminRequestsView.as_view(), name='admin-requests'),
     path('auth/', include('allauth.urls')),
-
+    path("login/microsoft/", views.microsoft_login_json, name="microsoft_login"),
+    path("login/microsoft/callback/", views.microsoft_callback, name="microsoft_callback"),
+    path("auth/data/", views.get_auth_data, name="auth_data"),
     # For managing forms
     path('forms/', RequestSubmitView.as_view(), name='form'),
     path('forms/<int:pk>/', RequestSubmitView.as_view(), name='form'),
