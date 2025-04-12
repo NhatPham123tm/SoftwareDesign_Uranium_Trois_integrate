@@ -11,6 +11,8 @@ from formProcessor.views import (
     payroll_step9, payroll_step10, payroll_review, delete_payroll, view_payroll_pdf
 )
 from api.views import get_csrf_token
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -64,5 +66,6 @@ urlpatterns = [
     path('api/check_email_exists/<str:email>/', check_email_exists, name='check_email_exists'),
 
     path("api/csrf/", get_csrf_token),
+    path('accounts/', include('allauth.urls')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-]

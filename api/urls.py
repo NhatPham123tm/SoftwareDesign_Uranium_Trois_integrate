@@ -13,11 +13,11 @@ router.register(r'reimburse', ReimbursementRequestViewSet)
 from .views import RequestSubmitView, SignupView, LoginView, UserFormsView, servePDF, RequestDeleteView, AdminRequestsView, RequestApprovalView
 from authentication import views
 urlpatterns = [
+    path('users/forms/', UserFormsView.as_view(), name='user-forms'),
     path('', include(router.urls)),
     # Users can view these
     path('signup/', SignupView.as_view(), name='signup'),
     path('login/', LoginView.as_view(), name='login'),
-    path('users/forms/', UserFormsView.as_view(), name='user-forms'),
     path('admin/requests/', AdminRequestsView.as_view(), name='admin-requests'),
     path('auth/', include('allauth.urls')),
     path("login/microsoft/", views.microsoft_login_json, name="microsoft_login"),
