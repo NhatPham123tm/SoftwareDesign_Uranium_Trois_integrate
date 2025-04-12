@@ -6,6 +6,7 @@ import './Login.css';
 
 const axiosInstance = axios.create({
   baseURL: 'http://localhost:8000/api',
+  withCredentials: true
 });
 
 export default function Login() {
@@ -26,23 +27,47 @@ export default function Login() {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-
+  
     if (!email || !password) {
       setError('Please enter both email and password');
       setIsLoading(false);
       return;
     }
-
+  
     try {
-      const res = await axiosInstance.post('/login/', { email, password });
-      const { token, isSuperUser, name, email: userEmail, role, status, userId } = res.data;
-
-      // You can modify this depending on your AuthContext structure
-      login({ isSuperUser, name, email: userEmail, role, status, userId }, token);
-
+      await axiosInstance.get('/csrf/'); // fetch CSRF token for using session
+      const res = await axiosInstance.post(
+        '/user_login/',
+        { email, password },
+        {
+          headers: {
+            'X-CSRFToken': getCSRFToken(),
+          },
+        }
+      );
+  
+      const { access_token, refresh_token, user } = res.data;
+  
+      // Store tokens if needed for future API calls
+      localStorage.setItem("access_token", access_token);
+      localStorage.setItem("refresh_token", refresh_token);
+      localStorage.setItem("userData", JSON.stringify(user));
+  
+      // Call login from AuthContext
+      login({
+        userId: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+      });
+  
       navigate('/home');
     } catch (err) {
-      const errorMessage = err.response?.data?.error || 'Login failed. Please try again.';
+      const errorMessage =
+        err.response?.data?.non_field_errors?.[0] ||
+        err.response?.data?.error ||
+        'Login failed. Please try again.';
       setError(errorMessage);
       console.error('Login error:', err);
     } finally {
@@ -50,6 +75,11 @@ export default function Login() {
     }
   };
 
+  function getCSRFToken() {
+    const match = document.cookie.match(/csrftoken=([^;]+)/);
+    return match ? match[1] : null;
+  }
+  
   const handleMicrosoftLogin = async () => {
     try {
       setIsLoading(true);

@@ -6,9 +6,9 @@ import Signature from './Signature';
 const ChangeAddressForm = () => {
   const location = useLocation();
   const [message, setMessage] = useState("");
-  const firstName = localStorage.getItem("firstName") || "";
-  const lastName = localStorage.getItem("lastName") || "";
-  const fullName = [firstName, lastName].filter(Boolean).join(" ");
+  const userDataRaw = localStorage.getItem("userData");
+  const userData = userDataRaw ? JSON.parse(userDataRaw) : {};
+  const fullName = userData.name || "";
 
   const [formData, setFormData] = useState({
     name: "",
@@ -32,10 +32,10 @@ const ChangeAddressForm = () => {
   });
 
   useEffect(() => {
-      setFormData(prevData => ({
-        ...prevData,
-        name: fullName
-      }));
+    setFormData(prevData => ({
+      ...prevData,
+      name: fullName,
+    }));
 
     if (location.state?.formData?.data) {
       setFormData({
@@ -43,7 +43,7 @@ const ChangeAddressForm = () => {
         draftId: location.state.formData.id || null,
       });
     }
-  }, [location.state]);
+  }, [location.state, fullName]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
