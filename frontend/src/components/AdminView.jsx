@@ -19,7 +19,12 @@ const AdminView = () => {
     DiplomaRequestForm: "Diploma Request",
     ChangeAddressForm: "Change of Address",
   };
-
+  
+  function getCSRFToken() {
+    const match = document.cookie.match(/csrftoken=([^;]+)/);
+    return match ? match[1] : null;
+  }
+  
   useEffect(() => {
     const fetchForms = async () => {
       const token = localStorage.getItem("token");
@@ -63,8 +68,7 @@ const AdminView = () => {
   }, [selectedStatus, selectedFormType, forms]);
 
   const handleApproval = async (id, status, reason = "") => {
-    const token = localStorage.getItem("token");
-
+    
     const body = { status };
     if (status === "rejected") {
       body.reason_for_return = reason;
@@ -77,9 +81,10 @@ const AdminView = () => {
     try {
       const response = await fetch(`http://localhost:8000/api/admin/requests/${id}/${status}/`, {
         method: "PUT",
+        credentials: "include",
         headers: {
-          Authorization: `Token ${token}`,
           "Content-Type": "application/json",
+          "X-CSRFToken": getCSRFToken(),
         },
         body: JSON.stringify(body),
       });
