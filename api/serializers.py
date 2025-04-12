@@ -46,6 +46,5 @@ class RequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Request
-        # Missing 'data' for now
-        fields = ['id', 'status', 'reason_for_return', 'form_type', 'pdf', 'signature', 'admin_signature']
+        fields = ['id', 'status', 'reason_for_return', 'form_type','data', 'pdf', 'signature', 'admin_signature']
         read_only_fields = ['id'] 

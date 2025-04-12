@@ -3,6 +3,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.db.models import JSONField 
 class roles(models.Model):
     role_name = models.CharField(max_length=30, unique=True)
 
@@ -276,7 +277,7 @@ class Request(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Draft')
     #user = models.ForeignKey('CustomUser', on_delete=models.CASCADE)
     reason_for_return = models.TextField(blank=True, null=True)
-    #data = JSONField(blank=True, null=True)
+    data = JSONField(blank=True, null=True)
     form_type = models.CharField(max_length=100) 
     pdf = models.FileField(upload_to='diploma_pdfs/', null=True, blank=True)
     signature = models.ImageField(upload_to='signatures/', null=True, blank=True)
