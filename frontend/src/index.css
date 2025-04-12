@@ -1,0 +1,52 @@
+/* frontend/src/Index.css */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%; 
+  width: 100%; 
+}
+
+body {
+  display: flex;
+  justify-content: center; 
+  align-items: center;   
+  min-height: 100vh;      
+  font-family: Arial, sans-serif;
+  background-color: #ffffff; 
+  overflow-y: hidden;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #bedcf5;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #bedcf5;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #ffffff;
+  border-radius: 10px;
+}

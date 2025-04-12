@@ -1,0 +1,170 @@
+.form-container {
+  margin: 20px;
+  padding: 30px;
+  background-color: #e2e2e2;
+  border-radius: 8px;
+  max-width: 600px;
+  margin: 50px auto;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  max-height: 80vh;
+  justify-content: center;
+  align-items: center;
+}
+
+.back-button {
+  display: inline-block;
+  margin-bottom: 20px;
+  text-decoration: none;
+  color: #3498db;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+label {
+  font-size: 16px;
+  color: #333;
+}
+
+input {
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+}
+
+select {
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+  background-color: white;
+  cursor: pointer;
+}
+
+button {
+  padding: 12px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+input:focus, button:focus, select:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.form-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+  align-items: center; 
+}
+
+.form-buttons button {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  background-color: #2575fc;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  width: 200px;
+}
+
+.form-buttons button:hover {
+  background-color: #6a11cb;
+  transform: translateY(-3px);
+}
+
+.form-buttons button:active {
+  transform: translateY(1px);
+}
+
+.signature-pad-container {
+  text-align: center;
+  border: 2px solid black; 
+  border-radius: 15px; 
+  padding: 20px;
+  margin-top: 20px;
+  display: inline-block; 
+  width: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.signature-buttons {
+  display: flex;
+  justify-content: center; 
+  margin-top: 10px;
+}
+
+.signature-buttons button {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  background-color: #2575fc;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  width: 200px;
+}
+
+.signature-buttons button:hover {
+  background-color: #6a11cb;
+  transform: translateY(-3px);
+}
+
+.large-save-btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  background-color: #2575fc;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  width: 200px;
+}
+
+.large-save-btn:hover {
+  background-color: #6a11cb;
+  transform: translateY(-3px);
+}
+
+.signature-box {
+  margin: 20px 0;
+}
+
+
+.form-message {
+  color: red;
+  text-align: center;
+  margin-top: 20px;
+}
