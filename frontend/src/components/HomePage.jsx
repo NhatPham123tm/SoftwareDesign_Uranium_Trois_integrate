@@ -5,43 +5,57 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 
+function getCSRFToken() {
+  const match = document.cookie.match(/csrftoken=([^;]+)/);
+  return match ? match[1] : null;
+}
+
 const HomePage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAuthData = async () => {
-      try {
-        const res = await axios.get("http://localhost:8000/api/microsoft-login/", {
-          withCredentials: true,
-        });
-
-        const { access_token, refresh_token, user } = res.data;
-
-        // Save to localStorage (optional)
-        localStorage.setItem("access_token", access_token);
-        localStorage.setItem("refresh_token", refresh_token);
-        localStorage.setItem("userData", JSON.stringify(user));
-
-        // Set user in context
-        login({
-          userId: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          status: user.status,
-        });
-
-        // optionally: navigate('/dashboard') if this isn’t Home
-      } catch (err) {
-        console.error("Failed to fetch auth data:", err);
-        navigate("/login");
+      const localUserData = localStorage.getItem("userData");
+      const accessToken = localStorage.getItem("access_token");
+  
+      if (localUserData && accessToken) {
+        const user = JSON.parse(localUserData);
+        login(user);
+        return;
       }
+  
+      // If local auth fails, try session login
+      axios.get("http://localhost:8000/api/microsoft-login/", {
+        withCredentials: true,
+        headers: {
+          "X-CSRFToken": getCSRFToken(),
+        },
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          const { user } = res.data;
+          login({
+            userId: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            status: user.status,
+          });
+        } else {
+          console.warn("Unexpected response status. Redirecting.");
+          navigate("/login");
+        }
+      })
+      .catch((err) => {
+        console.warn("No session cookie found or error occurred. Redirecting to login.", err);
+        navigate("/login");
+      });
     };
-
+  
     fetchAuthData();
-  }, [login, navigate]);
-
+  }, []);
+  
   return (
     <div className="home-container">
       <div className="box-container">

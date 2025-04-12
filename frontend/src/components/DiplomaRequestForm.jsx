@@ -14,7 +14,7 @@ const DiplomaRequestForm = () => {
   const userDataRaw = localStorage.getItem("userData");
   const userData = userDataRaw ? JSON.parse(userDataRaw) : {};
   const fullName = userData.name || "";
-  const studentID = userData.userId || "";
+  const studentID = userData.id || "";
 
 
   const [formData, setFormData] = useState({

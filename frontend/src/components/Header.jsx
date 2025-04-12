@@ -6,6 +6,11 @@ import Brand from '../assets/icons/logo.png';
 import Back from '../assets/icons/backButton.png';
 import './Header.css';
 
+function getCSRFToken() {
+  const match = document.cookie.match(/csrftoken=([^;]+)/);
+  return match ? match[1] : null;
+}
+
 const Header = () => {
   const [showNavbar, setShowNavbar] = useState(false);
   const { logout, auth } = useAuth();
@@ -22,10 +27,31 @@ const Header = () => {
   }
 
   const handleLogout = () => {
-    logout();
-    navigate('/login');
+    // Clear app data from localStorage
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("userData");
+  
+    // Optionally clear all localStorage
+    // localStorage.clear();
+  
+    // Tell the backend to end the session and clear the sessionid cookie
+    fetch("http://localhost:8000/logout/", {
+      method: "POST",
+      credentials: "include", // Include sessionid
+      headers: {
+        "X-CSRFToken": getCSRFToken(),
+      },
+    }).then(() => {
+      logout();        // clear context state
+      navigate("/login");
+    }).catch((err) => {
+      console.error("Logout failed", err);
+      logout();
+      navigate("/login");
+    });
   };
-
+  
   const handleGoBack = () => {
     navigate(-1);
   };
