@@ -3,6 +3,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import './Form.css';
 import Signature from './Signature';
 
+function getCSRFToken() {
+  const match = document.cookie.match(/csrftoken=([^;]+)/);
+  return match ? match[1] : null;
+}
+
 const ChangeAddressForm = () => {
   const location = useLocation();
   const [message, setMessage] = useState("");
@@ -63,12 +68,6 @@ const ChangeAddressForm = () => {
   const navigate = useNavigate();
   const handleSubmit = async (e, status = 'submitted') => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      setMessage("You must be logged in to submit the form.");
-      return;
-    }
 
     const { draftId, ...dataToSend } = formData;
     dataToSend.status = status;
@@ -78,19 +77,20 @@ const ChangeAddressForm = () => {
     try {
       const response = await fetch(url, {
         method: draftId ? "PUT" : "POST",
-        headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dataToSend),
-      });
+        credentials: "include", // ✅ use session cookies
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCSRFToken(),
+      },
+      body: JSON.stringify(dataToSend),
+    });
 
       const data = await response.json();
 
       if (response.ok) {
         navigate('/forms');
         setMessage(status === 'submitted' ? "Form submitted successfully!" : "Form saved as draft.");
-        if (status === 'draft' && !draftId && data.request?.id) {
+        if (status === 'Draft' && !draftId && data.request?.id) {
           setFormData((prev) => ({ ...prev, draftId: data.request.id }));
         }
       } else {
@@ -155,6 +155,7 @@ const ChangeAddressForm = () => {
     { value: 'WV', label: 'West Virginia' },
     { value: 'WI', label: 'Wisconsin' },
     { value: 'WY', label: 'Wyoming' },
+    
   ];
 
   return (
@@ -266,7 +267,7 @@ const ChangeAddressForm = () => {
         </div>
 
         <div className="form-buttons">
-          <button type="button" className="draft-btn" onClick={(e) => handleSubmit(e, 'draft')}>
+          <button type="button" className="draft-btn" onClick={(e) => handleSubmit(e, 'Draft')}>
             Save as Draft
           </button>
         </div>

@@ -15,22 +15,22 @@ const UserForms = () => {
     ChangeAddressForm: "Change of Address",
   };
 
-  const statusOptions = ["draft", "submitted", "rejected", "approved"];
+  const statusOptions = ["Draft", "Pending", "Rejected", "Approved", "Cancelled"];
+
+  const getCSRFToken = () => {
+    const match = document.cookie.match(/csrftoken=([^;]+)/);
+    return match ? match[1] : null;
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      setMessage("You need to be logged in to view your forms.");
-      return;
-    }
-
     const fetchUserForms = async () => {
       try {
         const response = await fetch("http://localhost:8000/api/users/forms/", {
           headers: {
-            Authorization: `Token ${token}`,
+            'X-CSRFToken': getCSRFToken(),
           },
+          method: "GET",
+          credentials: "include",
         });
 
         const data = await response.json();
@@ -49,19 +49,13 @@ const UserForms = () => {
   }, []);
 
   const deleteForm = async (formId) => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      setMessage("You need to be logged in to delete your forms.");
-      return;
-    }
-
     try {
       const response = await fetch(`http://localhost:8000/api/forms/${formId}/delete/`, {
-        method: "DELETE",
         headers: {
-          Authorization: `Token ${token}`,
+          'X-CSRFToken': getCSRFToken(),
         },
+        method: "DELETE",
+        credentials: "include", 
       });
 
       if (response.ok) {
@@ -155,7 +149,7 @@ const UserForms = () => {
                   </div>
                 )}
 
-                {form.status === "draft" && (
+                {form.status === "Draft" && (
                   <button className="edit-button" onClick={() => editForm(form)}>
                     Edit Draft
                   </button>

@@ -36,10 +36,10 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 # Media settings (for storing uploaded/generated PDFs)
-MEDIA_URL = '/media/'  
+MEDIA_URL = '/output/'  
 MEDIA_ROOT = os.path.join(BASE_DIR, 'output')  # Set output/ as media folder
 # Application definition
-
+LATEX_INTERPRETER = 'pdflatex'
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_tex',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -108,6 +109,12 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
             ],
         },
+    },
+    {
+        'NAME': 'tex',
+        'BACKEND': 'django_tex.engine.TeXEngine',
+        'DIRS': [BASE_DIR / "templates", BASE_DIR / "api" / "templates"],  # Add this line
+        'APP_DIRS': True,
     },
 ]
 
