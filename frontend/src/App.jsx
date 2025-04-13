@@ -29,14 +29,7 @@ function App() {
           <Route path="/diplomaRequestForm" element={<DiplomaRequestForm />} />
           <Route path="/forms" element={<UserForms />} />
           <Route path="/microsoft-callback" element={<MicrosoftCallback />} />
-          <Route
-            path="/admin/requests"
-            element={
-              <ProtectedRoute>
-                <AdminView />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/admin/requests" element={<AdminView />} />
         </Routes>
       </div>
     </AuthProvider>
