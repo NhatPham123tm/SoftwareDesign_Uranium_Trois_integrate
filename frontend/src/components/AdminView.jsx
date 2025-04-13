@@ -27,23 +27,19 @@ const AdminView = () => {
   
   useEffect(() => {
     const fetchForms = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setMessage("You must be logged in as an admin.");
-        return;
-      }
 
       try {
         const response = await fetch("http://localhost:8000/api/admin/requests/", {
+          credentials: "include",
           headers: {
-            Authorization: `Token ${token}`,
             "Content-Type": "application/json",
-          },
+            "X-CSRFToken": getCSRFToken(),
+        },
         });
 
         if (response.ok) {
           const data = await response.json();
-          const nonDraftForms = data.filter(form => form.status !== "draft");
+          const nonDraftForms = data.filter(form => form.status !== "Draft");
           setForms(nonDraftForms);
           setFilteredForms(nonDraftForms);
         } else {
@@ -68,7 +64,7 @@ const AdminView = () => {
   }, [selectedStatus, selectedFormType, forms]);
 
   const handleApproval = async (id, status, reason = "") => {
-    
+
     const body = { status };
     if (status === "rejected") {
       body.reason_for_return = reason;

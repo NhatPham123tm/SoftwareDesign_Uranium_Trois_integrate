@@ -22,11 +22,14 @@ from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
+from django.contrib.auth.decorators import user_passes_test
+from django.utils.decorators import method_decorator
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth.hashers import check_password
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import JsonResponse
-
+from authentication.views import is_admin
+from rest_framework.permissions import BasePermission
 class RoleViewSet(viewsets.ModelViewSet):
     queryset = roles.objects.all()
     serializer_class = RoleSerializer
@@ -356,22 +359,22 @@ class RequestDeleteView(APIView):
         user_request.delete()
 
         return Response({"message": "Form deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+
+class IsAdminUserRole(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and getattr(request.user, 'role_id', None) == 1
     
 class AdminRequestsView(APIView):
-    permission_classes = [IsAdminUser]
-
+    permission_classes = [IsAuthenticated, IsAdminUserRole]
     def get(self, request):
-        submitted_requests = Request.objects.exclude(status='draft')
+        submitted_requests = Request.objects.exclude(status='Draft')
         serializer = RequestSerializer(submitted_requests, many=True)
         return Response(serializer.data)
-    
+
 class RequestApprovalView(APIView):
-    permission_classes = [IsAdminUser]
-    
+    permission_classes = [IsAuthenticated, IsAdminUserRole]
     def put(self, request, pk):
         req = get_object_or_404(Request, id=pk)
-
-
         new_status = request.data.get("status")
         if new_status not in ['approved', 'rejected']:
             return Response(
