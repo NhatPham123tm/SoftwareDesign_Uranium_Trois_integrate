@@ -2,11 +2,9 @@
 
 The idea is create a landing page let user pick which team front end they want to use. This just to keep both team front-end but back end need further adjustment.  
 
-login is working for both microsoft and regular login  
-
-register is also working  
-
 since I used trois project back end, uranium side still need more adjustment  
+
+update: a bit buggy but most should be working now
 
 # To test the demo:
 
